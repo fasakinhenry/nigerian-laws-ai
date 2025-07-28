@@ -9,10 +9,33 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    # depends_on:
-    #   - backend
+    depends_on:
+      - backend
     # environment:
     #   - NEXT_PUBLIC_API_URL=http://localhost:8000 
+    networks:
+      - laws_network
+
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    ports:
+      - "8000:8000"
+    volumes: 
+      - ./backend:/app 
+      - ./data/backend-artefacts:/app/artefacts 
+    environment:
+      MONGO_URI: mongodb://mongodb:27017
+      MONGO_DB_NAME: nigerian_laws_db
+      MONGO_COLLECTION_NAME: "raw_documents"
+      GITHUB_PERSONAL_ACCESS_TOKEN: ${GITHUB_PERSONAL_ACCESS_TOKEN}
+      # OLLAMA_BASE_URL: http://ollama:11434
+      # OLLAMA_MODEL: qwen3:0.6b 
+    depends_on:
+      - mongodb
+      # - ollama 
+      # - ollama-setup
     networks:
       - laws_network
 
