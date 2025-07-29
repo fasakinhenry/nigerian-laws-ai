@@ -54,5 +54,14 @@ fi
 
 rm /app/check_data.py
 
-# exec uvicorn rag_pipeline.main:app --host 0.0.0.0 --port 8000 --workers 1
+if [ ! -f "/app/data/faiss_index/index.faiss" ]; then
+    echo "FAISS index not found. Running preprocessing pipeline..."
+    cd /app/rag-pipeline
+    python preprocessor.py
+    cd /app
+else
+    echo "FAISS index exists. Skipping preprocessing."
+fi
+
+exec uvicorn rag-pipeline.api:app --host 0.0.0.0 --port 8000 --workers 1
 
