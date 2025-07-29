@@ -5,6 +5,7 @@ python-dotenv
 langchain-community
 langchain
 langchain-huggingface
+langchain-ollama
 numpy==1.26.4
 torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
 faiss-cpu==1.8.0
@@ -13,4 +14,4 @@ fastapi
 beautifulsoup4
 pypdf
 GitPython
-
+cryptography>=40.0.0
