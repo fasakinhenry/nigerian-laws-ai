@@ -21,15 +21,21 @@ services:
     ports:
       - "8000:8000"
     volumes: 
-      - ./backend:/app 
+      - ./backend/data:/app/data
       - ./data/backend-artefacts:/app/artefacts 
     environment:
       MONGO_URI: mongodb://mongodb:27017
       MONGO_DB_NAME: nigerian_laws_db
       MONGO_COLLECTION_NAME: "raw_documents"
       GITHUB_PERSONAL_ACCESS_TOKEN: ${GITHUB_PERSONAL_ACCESS_TOKEN}
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: llama3.2:1b
+    env_file:
+      - ./.env
     depends_on:
       - mongodb
+      - ollama
+      - ollama-setup
     networks:
       - laws_network
 
@@ -57,6 +63,34 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/ 
     depends_on:
       - mongodb
+    networks:
+      - laws_network
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama_ai
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./data/ollama:/root/.ollama
+    networks:
+      - laws_network
+
+  ollama-setup:
+    image: curlimages/curl:latest
+    container_name: ollama_setup
+    command: >
+      sh -c "
+        echo 'Waiting for Ollama to be ready...' &&
+        until curl -s http://ollama:11434/api/tags > /dev/null; do
+          sleep 2
+        done &&
+        echo 'Ollama is ready. Pulling model: llama3.2:1b...' &&
+        curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"llama3.2:1b\"}' &&
+        echo 'Model llama3.2:1b pulled successfully!'
+      "
+    depends_on:
+      - ollama 
     networks:
       - laws_network
 
