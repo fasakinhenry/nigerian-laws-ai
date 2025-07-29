@@ -16,17 +16,19 @@ RUN pip install --no-cache-dir \
     langchain-community \
     langchain \
     langchain-huggingface \
+    langchain-ollama \
     numpy==1.26.4 \
     fastapi \
     beautifulsoup4 \
     pypdf \
-    GitPython
+    GitPython \
+    cryptography>=40.0.0
     
     RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu torch==2.6.0
     RUN pip install --no-cache-dir faiss-cpu==1.8.0
     RUN pip install --no-cache-dir sentence-transformers==2.7.0
     
-
+RUN mkdir -p /app/data
 
 COPY . .
 
