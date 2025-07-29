@@ -20,7 +20,7 @@ MONGO_DB_NAME = os.getenv("MONGO_DB_NAME")
 MONGO_COLLECTION_NAME = os.getenv("MONGO_COLLECTION_NAME") 
 GITHUB_PERSONAL_ACCESS_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN")
 
-TARGET_GITHUB_REPO_URL: str = "https://github.com/mykeels/nigerian-laws?tab=readme-ov-file"
+TARGET_GITHUB_REPO_URL: str = "https://github.com/mykeels/nigerian-laws"
 
 def _extract_owner_repo_from_url(url: str) -> Optional[tuple[str, str]]:
     
