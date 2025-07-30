@@ -1,6 +1,6 @@
 import os
 import time
-from typing import List, Dict, Optional
+from typing import List, Dict
 import logging
 from datetime import datetime
 from dotenv import load_dotenv
@@ -21,35 +21,6 @@ MONGO_COLLECTION_NAME = os.getenv("MONGO_COLLECTION_NAME")
 GITHUB_PERSONAL_ACCESS_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN")
 
 TARGET_GITHUB_REPO_URL: str = "https://github.com/mykeels/nigerian-laws"
-
-def _extract_owner_repo_from_url(url: str) -> Optional[tuple[str, str]]:
-    
-    try:
-        url_parts = url.split('?')[0].split('#')[0]
-        path_segments = [segment for segment in url_parts.split('/') if segment]
-        
-        if "github.com" in path_segments:
-            github_index = path_segments.index("github.com")
-            if len(path_segments) > github_index + 2:
-                owner = path_segments[github_index + 1]
-                repo = path_segments[github_index + 2]
-                
-                if repo.endswith(".git"):
-                    repo = repo[:-4]
-                return owner, repo
-            
-        logger.warning(f"Could not extract owner and repo from GitHub URL: {url}")
-        return None
-    except Exception as e:
-        logger.error(f"Error parsing GitHub URL {url}: {e}")
-        return None
-    
-parsed_repo = _extract_owner_repo_from_url(TARGET_GITHUB_REPO_URL)
-NIGERIAN_LAWS_GITHUB_REPOS_FOR_LOADER: List[tuple[str, str]] = []
-if parsed_repo:
-    NIGERIAN_LAWS_GITHUB_REPOS_FOR_LOADER.append(parsed_repo)
-else:
-    logger.critical("Failed to parse the target GitHub URL")
     
 class DataCollector:
     
