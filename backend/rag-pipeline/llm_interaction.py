@@ -102,6 +102,8 @@ class NigerianLawRAG:
             
         context = "".join(context_parts)
         
+        print(f"\nGenerated context for question '{question[:50]}...':\n{context}")
+        
         print(f"Generating answer using {self.model_type} ({self.model_name})...")
         prompt = self.prompt_template.format(context=context, question=question)
         
