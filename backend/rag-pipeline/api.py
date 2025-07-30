@@ -44,7 +44,7 @@ async def startup_event():
     global rag_system
     logger.info("Initializing RAG system on startup...")
     try:
-        rag_system = NigerianLawRAG(model_type="ollama", model_name="llama3.2:1b")
+        rag_system = NigerianLawRAG()
         logger.info("RAG system initialized successfully.")
     except FileNotFoundError:
         logger.error("FAISS index not found")
@@ -59,7 +59,7 @@ async def ask_question_stream(request: QuestionRequest):
         raise HTTPException(status_code=503, detail="Service Unavailable: RAG system not initialized. Ensure preprocessing ran and Ollama is ready.")
     
     question = request.question
-    top_k = 3 
+    top_k = 5
     
     async def generate_chunks():
         

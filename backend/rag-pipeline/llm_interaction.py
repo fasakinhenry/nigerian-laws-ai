@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict
+from typing import List, Dict, Optional
 from datetime import datetime
 
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -13,11 +13,11 @@ load_dotenv()
 
 class NigerianLawRAG:
     
-    def __init__(self, model_type: str = "ollama", model_name: str = "llama3.2:1b"):
+    def __init__(self, model_type: str = "ollama", model_name: Optional[str] = None):
         
         self.faiss_index_path = os.path.join("/app", "data", "faiss_index") 
         self.model_type = model_type
-        self.model_name = model_name
+        self.model_name = os.getenv("OLLAMA_MODEL_NAME")
         self.max_context_length = 3500
         
         self.embedding_model = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2')
@@ -75,7 +75,7 @@ class NigerianLawRAG:
         print(f"Found {len(relevant_documents)} relevant documents.")
         return relevant_documents
     
-    def generate_answer(self, question: str, max_content_length: int) -> Dict:
+    def generate_answer(self, question: str) -> Dict:
         
         relevant_documents = self.search_relevant_chunks(question, top_k=3)
         
@@ -92,7 +92,7 @@ class NigerianLawRAG:
             
             chunk_text = f"{source_citation}\nContent: {chunk_content}\n\n"
             
-            if context_length + len(chunk_text) > max_content_length:
+            if context_length + len(chunk_text) > self.max_content_length:
                 break
             
             context_parts.append(chunk_text)
@@ -102,7 +102,7 @@ class NigerianLawRAG:
             
         context = "".join(context_parts)
         
-        print(f"Generating answer using {self.model_type}...")
+        print(f"Generating answer using {self.model_type} ({self.model_name})...")
         prompt = self.prompt_template.format(context=context, question=question)
         
         answer = self.llm.invoke(prompt)
