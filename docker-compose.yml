@@ -9,9 +9,94 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    # depends_on:
-    #   - backend
-    # environment:
-    #   - NEXT_PUBLIC_API_URL=http://localhost:8000 
-    # networks:
-    #   - 
+    depends_on:
+      - backend
+    networks:
+      - laws_network
+
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    ports:
+      - "8000:8000"
+    volumes: 
+      - ./backend/data:/app/data
+      - ./data/backend-artefacts:/app/artefacts 
+    environment:
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DB_NAME: ${MONGO_DB_NAME}
+      MONGO_COLLECTION_NAME: ${MONGO_COLLECTION_NAME}
+      GITHUB_PERSONAL_ACCESS_TOKEN: ${GITHUB_PERSONAL_ACCESS_TOKEN}
+    env_file:
+      - ./.env
+    depends_on:
+      - mongodb
+      - ollama
+      - ollama-setup
+    networks:
+      - laws_network
+
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongo_Db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - laws_network
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: laws_mongo_express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_PORT: ${ME_CONFIG_MONGODB_PORT}
+      ME_CONFIG_BASICAUTH_USERNAME: ${ME_CONFIG_BASICAUTH_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_CONFIG_BASICAUTH_PASSWORD}
+      ME_CONFIG_MONGODB_URL: ${ME_CONFIG_MONGODB_URL}
+    depends_on:
+      - mongodb
+    networks:
+      - laws_network
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama_ai
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./data/ollama:/root/.ollama
+    networks:
+      - laws_network
+
+  ollama-setup:
+    image: curlimages/curl:latest
+    container_name: ollama_setup
+    environment:
+      OLLAMA_MODEL_NAME: ${OLLAMA_MODEL_NAME}
+    command: >
+      sh -c "
+        echo 'Waiting for Ollama to be ready...' &&
+        until curl -s http://ollama:11434/api/tags > /dev/null; do
+          sleep 2
+        done &&
+        echo 'Ollama is ready. Pulling model: '$$OLLAMA_MODEL_NAME &&
+        curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"'$$OLLAMA_MODEL_NAME'\"}' &&
+        echo 'Model '$$OLLAMA_MODEL_NAME' pulled successfully!'
+      "
+    depends_on:
+      - ollama 
+    networks:
+      - laws_network
+
+volumes:
+  mongo_data:
+
+networks:
+  laws_network:
+    driver: bridge
