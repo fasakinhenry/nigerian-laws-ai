@@ -24,9 +24,9 @@ services:
       - ./backend/data:/app/data
       - ./data/backend-artefacts:/app/artefacts 
     environment:
-      MONGO_URI: mongodb://mongodb:27017
-      MONGO_DB_NAME: nigerian_laws_db
-      MONGO_COLLECTION_NAME: "raw_documents"
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DB_NAME: ${MONGO_DB_NAME}
+      MONGO_COLLECTION_NAME: ${MONGO_COLLECTION_NAME}
       GITHUB_PERSONAL_ACCESS_TOKEN: ${GITHUB_PERSONAL_ACCESS_TOKEN}
     env_file:
       - ./.env
@@ -55,10 +55,10 @@ services:
       - "8081:8081"
     environment:
       ME_CONFIG_MONGODB_SERVER: mongodb
-      ME_CONFIG_MONGODB_PORT: 27017
-      ME_CONFIG_BASICAUTH_USERNAME: admin 
-      ME_CONFIG_BASICAUTH_PASSWORD: pass
-      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/ 
+      ME_CONFIG_MONGODB_PORT: ${ME_CONFIG_MONGODB_PORT}
+      ME_CONFIG_BASICAUTH_USERNAME: ${ME_CONFIG_BASICAUTH_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_CONFIG_BASICAUTH_PASSWORD}
+      ME_CONFIG_MONGODB_URL: ${ME_CONFIG_MONGODB_URL}
     depends_on:
       - mongodb
     networks:
@@ -77,15 +77,17 @@ services:
   ollama-setup:
     image: curlimages/curl:latest
     container_name: ollama_setup
+    environment:
+      OLLAMA_MODEL_NAME: ${OLLAMA_MODEL_NAME}
     command: >
       sh -c "
         echo 'Waiting for Ollama to be ready...' &&
         until curl -s http://ollama:11434/api/tags > /dev/null; do
           sleep 2
         done &&
-        echo 'Ollama is ready. Pulling model: llama3.2:1b...' &&
-        curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"llama3.2:1b\"}' &&
-        echo 'Model llama3.2:1b pulled successfully!'
+        echo 'Ollama is ready. Pulling model: '$$OLLAMA_MODEL_NAME &&
+        curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"'$$OLLAMA_MODEL_NAME'\"}' &&
+        echo 'Model '$$OLLAMA_MODEL_NAME' pulled successfully!'
       "
     depends_on:
       - ollama 
