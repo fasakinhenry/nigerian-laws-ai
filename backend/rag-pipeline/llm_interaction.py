@@ -31,7 +31,7 @@ class NigerianLawRAG:
             template="""You are an expert on Nigerian laws. Use the following context to answer the question accurately and informatively.
             If the context doesn't contain enough information, state clearly that you cannot answer based on the provided information.
             Always provide specific dates, names, and events when available.
-            Keep your answer informative but concise.
+            Keep your answer informative but concise. If context dose'nt match the query simply respond with I am a Nigerian law assistant. Please provide a meaningful question. For example: 'What are the legal requirements for registering a business in Nigeria?'.
 
             Context:
             {context}
@@ -78,6 +78,17 @@ class NigerianLawRAG:
     def generate_answer(self, question: str) -> Dict:
         
         relevant_documents = self.search_relevant_chunks(question, top_k=3)
+        
+        if not relevant_documents:
+            print("No relevant documents found. Returning custom response.")
+            return {
+                "question": question,
+                "answer": "I am a Nigerian law assistant. Please provide a meaningful question. For example: 'What are the legal requirements for registering a business in Nigeria?'",
+                "sources": [],
+                "relevant_chunks_found": 0,
+                "context_chunks_used": 0,
+                "timestamp": datetime.now().isoformat()
+            }
         
         context_parts = []
         context_length = 0
