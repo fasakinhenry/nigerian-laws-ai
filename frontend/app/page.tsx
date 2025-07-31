@@ -38,7 +38,7 @@ export default function Home() {
     setMessages(prevMessages => [...prevMessages, initialAssistantMessage])
 
     try {
-      const BackendUrl = process.env.NEXT_PUBLIC_PYTHON_BACKEND_URL;
+      const BackendUrl = process.env.NEXT_PUBLIC_API_URL;
       const response = await fetch(`${BackendUrl}/ask`, {
         method: 'POST',
         headers: {
