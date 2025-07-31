@@ -12,7 +12,7 @@ Follow these steps to set up and run the application locally using Docker Compos
 
 ### 1. Environment Configuration
 
-This project relies on several environment variables for its services (MongoDB, Ollama, Backend API, etc.). You must create a `.env` file in the root directory of the project to define these variables.
+This project relies on several environment variables for its services (MongoDB, Ollama, Backend API, etc.). These variables are sensitive and not committed to the repository.
 
 **Steps:**
 
@@ -20,14 +20,15 @@ This project relies on several environment variables for its services (MongoDB, 
     ```bash
     cd nigerian-laws-ai
     ```
-2.  Create a new file named `.env` in this directory.
+2.  **Create your `.env` file** by copying the provided `example.env`:
     ```bash
-    touch .env
+    cp example.env .env
     ```
-3.  Copy the content from the `example.env` file (which you should create, see below) into your new `.env` file.
-4.  **Important:** Replace the placeholder values (e.g., `your_github_personal_access_token_here`, `admin_user`, `admin_password`, `llama3.2:1b`) with your actual desired configuration.
+3.  Open the newly created `.env` file in your text editor.
+4.  **Important:** Replace the placeholder values (e.g., `your_github_personal_access_token_here`, `admin_user`, `admin_password`, `llama3.2:1b`) with your actual desired configuration. Review all comments in the `.env` file for guidance.
 
-    **Example `.env` content (for `example.env`):**
+    **Reference: `example.env` Content**
+    (This section is for reference only; the actual file is `example.env` in your repository)
     ```dotenv
     # .env file for the Nigerian Laws AI Assistant
 
@@ -64,8 +65,8 @@ This project relies on several environment variables for its services (MongoDB, 
     # ME_CONFIG_MONGODB_PORT: Default MongoDB port.
     ME_CONFIG_MONGODB_PORT=27017
     # ME_CONFIG_BASICAUTH_USERNAME / PASSWORD: Credentials for accessing Mongo Express UI.
-    ME_CONFIG_BASICAUTH_USERNAME=admin
-    ME_CONFIG_BASICAUTH_PASSWORD=pass
+    ME_CONFIG_BASICAUTH_USERNAME=admin_user
+    ME_CONFIG_BASICAUTH_PASSWORD=admin_pass
     # ME_CONFIG_MONGODB_URL: Full MongoDB connection string for Mongo Express.
     ME_CONFIG_MONGODB_URL=mongodb://mongodb:27017/
 
@@ -95,5 +96,3 @@ Once your `.env` file is configured:
     * **Frontend UI:** Once all services are up, open your web browser and go to `http://localhost:3000`.
     * **Mongo Express UI:** Access your MongoDB database visually at `http://localhost:8081` using the credentials you set in `.env`.
     * **Ollama API:** The Ollama API is exposed on `http://localhost:11434`.
-
----
