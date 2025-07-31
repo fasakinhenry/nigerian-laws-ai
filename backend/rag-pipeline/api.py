@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from typing import List, Dict, Optional, Set
+from typing import Optional, Set
 import time
 from datetime import datetime
 import json
@@ -18,6 +18,7 @@ allowed_cors_origins = [
     "http://localhost:8080", 
     "http://127.0.0.1:3000",
     "http://127.0.0.1:8080",
+    "http://frontend:3000"
 ]
 
 app = FastAPI(
@@ -69,11 +70,10 @@ async def ask_question_stream(request: QuestionRequest):
             
             context_parts = []
             context_length = 0
-            sources: Set[str] = set()
             
             for doc in relevant_info:
                 doc_title = doc.metadata.get("file_path")
-                doc_url = doc.metadata.get('url', 'No URL')
+            
                 chunk_content = doc.page_content 
                 
                 source_citation_text = f"Source: {doc_title}"
@@ -82,7 +82,6 @@ async def ask_question_stream(request: QuestionRequest):
                 
                 context_parts.append(chunk_text)
                 context_length += len(chunk_text)
-                sources.add(f"{doc_title} ({doc_url})")
                 
             context = "".join(context_parts)
             if not context:
@@ -100,7 +99,6 @@ async def ask_question_stream(request: QuestionRequest):
             
             initial_metadata = {
                     "type": "metadata",
-                    "sources": sorted(list(sources)),
                     "relevant_chunks_found": len(relevant_info),
                     "context_chunks_used": len(context_parts),
                     "model": rag_system.model_name
