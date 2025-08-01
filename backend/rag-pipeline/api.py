@@ -19,6 +19,7 @@ allowed_cors_origins = [
     "http://127.0.0.1:4000",
     "http://127.0.0.1:8080",
     "http://frontend:4000",
+    "http://localhost:8000",
     "http://frontend:3000",
     "http://law.9jagpt.com",
     "https://law.9jagpt.com",
