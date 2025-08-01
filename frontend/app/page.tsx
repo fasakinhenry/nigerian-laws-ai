@@ -11,9 +11,10 @@ interface Message {
 
 export default function Home() {
 
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [isServerReady, setIsServerReady] = useState(false);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -22,6 +23,28 @@ export default function Home() {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
     }
   }, [messages])
+
+  useEffect(() => {
+    const checkServerStatus = async () => {
+      try {
+        const BackendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+        const response = await fetch(`${BackendUrl}/health`);
+        const data = await response.json();
+
+        if (response.ok && data.status === 'ready') {
+          console.log("Backend is ready!");
+          setIsServerReady(true);
+          return;
+        }
+
+      } catch (error) {
+        console.error("Failed to connect to backend, retrying...", error);
+      }
+
+      setTimeout(checkServerStatus, 2000);
+    }
+    checkServerStatus();
+  }, [])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -126,6 +149,17 @@ export default function Home() {
       setLoading(false);
     }
   };
+
+  if (!isServerReady) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loadingContainer}>
+          <p className={styles.loadingText}>Initializing Nigerian Laws AI Assistant...</p>
+          <div className={styles.spinner}></div>
+        </div>
+      </div>
+    );
+  }
 
 
   return (

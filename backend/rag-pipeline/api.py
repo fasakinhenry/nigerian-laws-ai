@@ -142,3 +142,10 @@ async def ask_question_stream(request: QuestionRequest):
             "Connection": "keep-alive",
         }
     )
+    
+@app.get("/health")
+async def health_check():
+    if rag_system is None or rag_system.vector_store is None:
+        return {"status": "initializing", "message": "RAG system is not yet ready."}
+    
+    return {"status": "ready", "message": "API is ready to serve requests."}
