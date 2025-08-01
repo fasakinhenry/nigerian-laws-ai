@@ -48,7 +48,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - mongo_data:/data/db
+      - ./data/mongodb:/data/db
     networks:
       - laws_network
 
