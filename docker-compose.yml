@@ -11,6 +11,7 @@ services:
       - /app/node_modules
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_BACKEND_URL}
+      FRONTEND_PORT: ${FRONTEND_PORT}
     env_file:
       - ./.env
     depends_on:
@@ -48,7 +49,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./data/mongodb:/data/db
+      - mongo_data:/data/db
     networks:
       - laws_network
 
