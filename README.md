@@ -31,51 +31,22 @@ This project relies on several environment variables for its services (MongoDB, 
     (This section is for reference only; the actual file is `example.env` in your repository)
 
     ```dotenv
-    # .env file for the Nigerian Laws AI Assistant
-
-    # --- MongoDB Configuration ---
-    # MONGO_URI: Connection string for MongoDB.
-    #            'mongodb' is the service name defined in docker-compose.yml
-    #            '27017' is the default port for MongoDB
-    #            '/nigerian_laws_db' is the database name
     MONGO_URI=mongodb://mongodb:27017/nigerian_laws_db
     MONGO_DB_NAME=nigerian_laws_db
     MONGO_COLLECTION_NAME=raw_documents
 
-    # --- GitHub Configuration ---
-    # GITHUB_PERSONAL_ACCESS_TOKEN: Required for certain backend functionalities (e.g., if pulling data from GitHub).
-    #                               Replace with your actual GitHub Personal Access Token.
-    # Get one here: [https://github.com/settings/tokens](https://github.com/settings/tokens) (select 'repo' scope for full access)
     GITHUB_PERSONAL_ACCESS_TOKEN=your_github_personal_access_token_here
 
-    # --- Ollama Configuration ---
-    # OLLAMA_BASE_URL: The URL for the Ollama service within the Docker network.
-    #                  'ollama' is the service name defined in docker-compose.yml
-    #                  '11434' is the default port for Ollama
     OLLAMA_BASE_URL=http://ollama:11434
-    # OLLAMA_MODEL_NAME: The name of the AI model Ollama should pull and serve.
-    #                    Common models: llama3.2:1b, llama2, mistral, phi3, etc.
-    #                    Ensure the model name is correct for Ollama.
     OLLAMA_MODEL_NAME=llama3.2:1b # You can change this to your preferred model
 
-    # --- Mongo Express Configuration ---
-    # These settings control the Mongo Express web UI for your MongoDB database.
-    # You can access Mongo Express at http://localhost:8081
-    # ME_CONFIG_MONGODB_SERVER: Connects to the 'mongodb' service within the Docker network.
     ME_CONFIG_MONGODB_SERVER=mongodb
-    # ME_CONFIG_MONGODB_PORT: Default MongoDB port.
     ME_CONFIG_MONGODB_PORT=27017
-    # ME_CONFIG_BASICAUTH_USERNAME / PASSWORD: Credentials for accessing Mongo Express UI.
+
     ME_CONFIG_BASICAUTH_USERNAME=admin_user
     ME_CONFIG_BASICAUTH_PASSWORD=admin_pass
-    # ME_CONFIG_MONGODB_URL: Full MongoDB connection string for Mongo Express.
     ME_CONFIG_MONGODB_URL=mongodb://mongodb:27017/
 
-    # --- Frontend API URL Configuration ---
-    # NEXT_PUBLIC_BACKEND_URL: This is the URL your frontend (running in the browser)
-    #                          will use to communicate with the backend.
-    #                          Since your browser is on your host machine, it accesses
-    #                          Docker services via localhost and their exposed ports.
     NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
     ```
 
