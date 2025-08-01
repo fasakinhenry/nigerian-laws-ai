@@ -44,13 +44,6 @@ export MONGO_URI=${MONGO_URI}
 export MONGO_DB_NAME=${MONGO_DB_NAME}
 export DATA_COLLECTION_NAME=${MONGO_COLLECTION_NAME="raw_documents"}
 
-# Wait for MongoDB to be ready
-echo "Waiting for MongoDB to be ready..."
-until python /app/check_data.py 2>/dev/null; do
-    echo "MongoDB not ready yet, waiting..."
-    sleep 5
-done
-
 if python /app/check_data.py; then
     echo "Data already exists. Skipping data collection pipeline."
 else
