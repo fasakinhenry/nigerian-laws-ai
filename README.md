@@ -8,7 +8,7 @@ Follow these steps to set up and run the application locally using Docker Compos
 
 ### Prerequisites
 
-* Docker Desktop (or Docker Engine and Docker Compose) installed and running on your system.
+- Docker Desktop (or Docker Engine and Docker Compose) installed and running on your system.
 
 ### 1. Environment Configuration
 
@@ -29,6 +29,7 @@ This project relies on several environment variables for its services (MongoDB, 
 
     **Reference: `example.env` Content**
     (This section is for reference only; the actual file is `example.env` in your repository)
+
     ```dotenv
     # .env file for the Nigerian Laws AI Assistant
 
@@ -84,15 +85,18 @@ Once your `.env` file is configured:
 
 1.  Make sure you are in the root directory of the project.
 2.  Execute the `run.sh` script to start all services:
+
     ```bash
     sh run.sh
     ```
+
     This script will:
-    * Ensure Docker Desktop is running.
-    * Build (if necessary) and start all the services defined in `docker-compose.yml` in detached mode (`-d`). This includes the MongoDB, Ollama, Backend, and Frontend services.
-    * The `ollama-setup` service will pull the specified AI model. This might take some time depending on your internet connection and the model size.
+
+    - Ensure Docker Desktop is running.
+    - Build (if necessary) and start all the services defined in `docker-compose.yml` in detached mode (`-d`). This includes the MongoDB, Ollama, Backend, and Frontend services.
+    - The `ollama-setup` service will pull the specified AI model. This might take some time depending on your internet connection and the model size.
 
 3.  Access the application:
-    * **Frontend UI:** Once all services are up, open your web browser and go to `http://localhost:3000`.
-    * **Mongo Express UI:** Access your MongoDB database visually at `http://localhost:8081` using the credentials you set in `.env`.
-    * **Ollama API:** The Ollama API is exposed on `http://localhost:11434`.
+    - **Frontend UI:** Once all services are up, open your web browser and go to `http://localhost:4000`.
+    - **Mongo Express UI:** Access your MongoDB database visually at `http://localhost:8081` using the credentials you set in `.env`.
+    - **Ollama API:** The Ollama API is exposed on `http://localhost:11434`.
