@@ -75,6 +75,7 @@ services:
       - "11434:11434"
     volumes:
       - ./data/ollama:/root/.ollama
+    user: "1000:1000" 
     networks:
       - laws_network
 
