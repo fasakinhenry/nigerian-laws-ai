@@ -1,6 +1,6 @@
 # Nigerian Laws AI Assistant
 
-This project provides an AI-powered assistant for Nigerian legal information.
+This project provides an AI-powered assistant for Nigerian legal information, built on a Retrieval-Augmented Generation (RAG) pipeline. The system retrieves information from a knowledge base of Nigerian laws to provide accurate and context-aware responses.
 
 ## Getting Started
 
