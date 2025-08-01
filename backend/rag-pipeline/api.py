@@ -18,11 +18,11 @@ allowed_cors_origins = [
     "http://localhost:8080", 
     "http://127.0.0.1:4000",
     "http://127.0.0.1:8080",
-    "http://frontend:4000"
+    "http://frontend:4000",
     "http://frontend:3000",
     "http://law.9jagpt.com",
     "https://law.9jagpt.com",
-    "law.9jagpt.com"
+    "https://law-backend.9jagpt.com"
 ]
 
 app = FastAPI(
