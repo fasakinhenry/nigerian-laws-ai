@@ -27,11 +27,37 @@ class NigerianLawRAG:
         
         self.vector_store = self.load_vector_store()
         
+        self.query_rewrite_prompt = PromptTemplate(
+            template="""You are a search query optimizer for vector database searches. Your task is to reformulate user queries into more effective search terms.
+            Given a user's search query, you must:
+            1. Identify the core concepts and intent
+            2. Add relevant synonyms and related terms
+            3. Remove irrelevant filler words
+            4. Structure the query to emphasize key terms
+            5. Include technical or domain-specific terminology if applicable
+
+            Provide only the optimized search query without any explanations, greetings, or additional commentary.
+
+            Example input: "how to start a company in Nigeria"
+            Example output: "corporate affairs commission company registration requirements business incorporation enterprise formation legal documents"
+
+            Constraints:
+            - Output only the enhanced search terms
+            - Keep focus on searchable concepts
+            - Include both specific and general related terms
+            - Maintain all important meaning from original query
+
+            Original Query: {original_query}
+
+            Optimized Query:""",
+            input_variables=["original_query"]
+        )
+        
         self.prompt_template = PromptTemplate(
             template="""You are an expert on Nigerian laws. Use the following context to answer the question accurately and informatively.
             If the context doesn't contain enough information, state clearly that you cannot answer based on the provided information.
             Always provide specific dates, names, and events when available.
-            Keep your answer informative but concise. If context dose'nt match the query simply respond with I am a Nigerian law assistant. Please provide a meaningful question. For example: 'What are the legal requirements for registering a business in Nigeria?'.
+            Keep your answer informative but concise. If context dose'nt match the question simply respond with I am a Nigerian law assistant. Please provide a meaningful question. For example: 'What are the legal requirements for registering a business in Nigeria?'.
 
             Context:
             {context}
@@ -65,12 +91,20 @@ class NigerianLawRAG:
         except Exception as e:
             print(f"Error loading FAISS index: {e}")
             raise
+    
+    def _rewrite_query(self, query: str) -> str:
+        rewrite_prompt_formatted = self.query_rewrite_prompt.format(original_query=query)
+        rewritten_query = self.llm.invoke(rewrite_prompt_formatted)
+        print(f"Rewritten query: '{rewritten_query.strip()}'")
+        return rewritten_query.strip()
         
     def search_relevant_chunks(self, query: str, top_k: int) -> List[Document]:
         
+        rewritten_query = self._rewrite_query(query)
+        
         print(f"Searching for top {top_k} relevant chunks for query: '{query[:50]}'")
         
-        relevant_documents = self.vector_store.similarity_search(query, k=top_k)
+        relevant_documents = self.vector_store.similarity_search(rewritten_query, k=top_k)
         
         print(f"Found {len(relevant_documents)} relevant documents.")
         return relevant_documents
@@ -97,7 +131,7 @@ class NigerianLawRAG:
         for doc in relevant_documents:
             doc_title = doc.metadata.get("file_path")
             doc_url = doc.metadata.get('url', 'No URL') 
-            chunk_content = doc.content
+            chunk_content = doc.page_content
             
             source_citation = f"Source: {doc_title} ({doc_url})" if doc_url and doc_url != 'Unknown URL' else f"Source: {doc_title}"
             
