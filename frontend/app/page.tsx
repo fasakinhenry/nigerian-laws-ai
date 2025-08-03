@@ -8,9 +8,26 @@ interface Message {
   isError?: boolean; 
 }
 
+const suggestionCards = [
+  {
+    title: "What are the legal requirements",
+    subtitle: "for company registration in Nigeria?"
+  },
+  {
+    title: "How do I obtain",
+    subtitle: "a Certificate of Occupancy?"
+  },
+  {
+    title: "What are the penalties",
+    subtitle: "for tax evasion under Nigerian law?"
+  },
+  {
+    title: "Explain the process",
+    subtitle: "of property acquisition in Nigeria"
+  }
+];
 
 export default function Home() {
-
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,6 +62,11 @@ export default function Home() {
     }
     checkServerStatus();
   }, [])
+
+  const handleSuggestionClick = (suggestion: typeof suggestionCards[0]) => {
+    const fullQuestion = `${suggestion.title} ${suggestion.subtitle}`;
+    setInput(fullQuestion);
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -161,50 +183,78 @@ export default function Home() {
     );
   }
 
-
   return (
     <div className={styles.container}>
-      <h1 className={styles.header}>Nigerian Laws AI Assistant</h1>
-
       <div className={styles.chatBox} ref={chatContainerRef}>
-        {messages.length === 0 && (
+        {messages.length === 0 ? (
           <div className={styles.emptyState}>
-            Welcome! Ask me anything about Nigerian laws.
-          </div>
-        )}
-        {messages.map((msg, index) => (
-          <div key={index} className={`${styles.message} ${msg.role === 'user' ? styles.userMessage : styles.assistantMessage}`}>
-            <div className={`${styles.messageContent} ${msg.isError ? styles.error : ''}`}>
-              <p className={styles.messageText}>{msg.content}</p>
+            <div className={styles.welcomeText}>
+              <h1 className={styles.welcomeTitle}>Hello there!</h1>
+              <p className={styles.welcomeSubtitle}>What Nigerian laws would you love to know today?</p>
+            </div>
+            <div className={styles.suggestionCards}>
+              {suggestionCards.map((suggestion, index) => (
+                <div 
+                  key={index} 
+                  className={styles.suggestionCard}
+                  onClick={() => handleSuggestionClick(suggestion)}
+                >
+                  <h4>{suggestion.title}</h4>
+                  <p>{suggestion.subtitle}</p>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
-        {loading && (
-          <div className={`${styles.message} ${styles.assistantMessage}`}>
-            <div className={styles.messageContent}>
-              <p>Thinking...</p>
-            </div>
-          </div>
+        ) : (
+          <>
+            {messages.map((msg, index) => (
+              <div key={index} className={`${styles.message} ${msg.role === 'user' ? styles.userMessage : styles.assistantMessage}`}>
+                <div className={`${styles.messageContent} ${msg.isError ? styles.error : ''}`}>
+                  <p className={styles.messageText}>{msg.content}</p>
+                </div>
+              </div>
+            ))}
+            {loading && (
+              <div className={`${styles.message} ${styles.assistantMessage}`}>
+                <div className={styles.messageContent}>
+                  <div className={styles.loadingDots}>
+                    <div className={styles.loadingDot}></div>
+                    <div className={styles.loadingDot}></div>
+                    <div className={styles.loadingDot}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
       <form className={styles.inputForm} onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask about Nigerian laws..."
-          className={styles.inputField}
-          disabled={loading}
-        />
-        <button
-          type="submit"
-          className={styles.sendButton}
-          disabled={loading}
-        >
-          Send
-        </button>
+        <div className={styles.inputContainer}>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask a question about Nigerian Laws..."
+            className={styles.inputField}
+            disabled={loading}
+          />
+          <div className={styles.inputActions}>
+            <button
+              type="submit"
+              className={styles.sendButton}
+              disabled={loading || !input.trim()}
+            >
+              <svg className={styles.sendIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </form>
+      <div className={styles.name}>
+        <p>Developed by <span><a href="https://www.linkedin.com/in/franklin-n/" target="_blank">Franklin</a></span></p>
+      </div>
     </div>
   );
 }
