@@ -1,14 +1,34 @@
 @import "tailwindcss";
 
 :root {
-  --law-primary: #003366;
-  --law-secondary-blue: #0056b3;
-  --law-bg-light: #F8F8F8;
-  --law-text-dark: #333333;
-  --law-text-medium: #666666;
-  --law-bubble-user: var(--law-primary);
-  --law-bubble-assistant: #E0E6EF;
-  --law-error-bg: #F8D7DA;
-  --law-error-text: #721C24;
-  --law-error-border: #F5C6CB; 
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --muted: #171717;
+  --muted-foreground: #a3a3a3;
+  --border: #262626;
+  --input: #1a1a1a;
+  --primary: #0ea5e9;
+  --primary-foreground: #f8fafc;
+  --secondary: #262626;
+  --secondary-foreground: #fafafa;
+  --accent: #262626;
+  --accent-foreground: #fafafa;
+  --destructive: #dc2626;
+  --destructive-foreground: #fafafa;
+  --ring: #0ea5e9;
+  --radius: 0.75rem;
+  --card-background: #1a1a1a;
+  --card-border: #2a2a2a;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
