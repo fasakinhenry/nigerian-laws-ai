@@ -2,7 +2,9 @@
 import React, { useState, FormEvent, useRef, useEffect } from "react";
 import styles from './style/home.module.css';
 import Image from 'next/image';
-import LawImg from '@/app/assets/lawImg.png'
+import LawImg from '@/app/assets/lawImg.png';
+import BannerImg from '@/app/assets/banner.png';
+
 
 interface Message {
   role: 'user' | 'assistant';
@@ -193,6 +195,14 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.construct_banner}>
+        <Image
+        src={BannerImg}
+        alt="img"
+        height={150}
+        width={150}
+        />
+      </div>
       <div className={styles.chatBox} ref={chatContainerRef}>
         {messages.length === 0 ? (
           <div className={styles.emptyState}>
