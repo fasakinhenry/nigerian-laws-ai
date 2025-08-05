@@ -38,7 +38,7 @@ This project relies on several environment variables for its services (MongoDB, 
     GITHUB_PERSONAL_ACCESS_TOKEN=your_github_personal_access_token_here
 
     OLLAMA_BASE_URL=http://ollama:11434
-    OLLAMA_MODEL_NAME=llama3.2:1b # You can change this to your preferred model
+    OLLAMA_MODEL_NAME=llama3.2:1b 
 
     ME_CONFIG_MONGODB_SERVER=mongodb
     ME_CONFIG_MONGODB_PORT=27017
