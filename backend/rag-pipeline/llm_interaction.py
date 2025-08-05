@@ -27,46 +27,56 @@ class NigerianLawRAG:
         
         self.vector_store = self.load_vector_store()
         
+        self.welcome_prompt = PromptTemplate (
+            template="""You are a Nigerian Law AI Assistant. Respond to this greeting in a friendly, helpful, and concise manner.
+            Greet the user and ask them what legal topic they would like to know about today.
+            
+            User's greeting: {user_greeting}
+            
+            """,
+            input_variables=["user_greeting"]
+        )
+        
+        self.what_are_you_prompt = PromptTemplate (
+            template="""You are a Nigerian Law AI Assistant.
+            Answer the user's question about what you are.
+            Explain that you are an AI assistant designed to provide information on Nigerian laws,
+            based on a database of legal documents.
+
+            User's question: {user_question}
+            """,
+            input_variables=["user_question"]
+        )
+        
         self.query_rewrite_prompt = PromptTemplate(
-            template="""You are a search query optimizer for vector database searches. Your task is to reformulate user queries into more effective search terms.
-            Given a user's search query, you must:
-            1. Identify the core concepts and intent
-            2. Add relevant synonyms and related terms
-            3. Remove irrelevant filler words
-            4. Structure the query to emphasize key terms
-            5. Include technical or domain-specific terminology if applicable
+            template="""You are a legal search query optimizer. Reformulate the user's query to find relevant Nigerian legal documents.
 
-            Provide only the optimized search query without any explanations, greetings, or additional commentary.
-
-            Example input: "how to start a company in Nigeria"
-            Example output: "corporate affairs commission company registration requirements business incorporation enterprise formation legal documents"
-
-            Constraints:
-            - Output only the enhanced search terms
-            - Keep focus on searchable concepts
-            - Include both specific and general related terms
-            - Maintain all important meaning from original query
+            For the query, identify:
+            1. Legal domain (criminal law, corporate law, constitutional law, etc.)
+            2. Key legal concepts and terminology
+            3. Relevant Nigerian acts or laws
+            4. Synonyms and related legal terms
 
             Original Query: {original_query}
 
-            Optimized Query:""",
+            Enhanced Legal Search Query:""",
             input_variables=["original_query"]
         )
         
         self.prompt_template = PromptTemplate(
-            template="""You are an expert on Nigerian laws. Use the following context to answer the question accurately and informatively.
-            If the context doesn't contain enough information, state clearly that you cannot answer based on the provided information.
-            Always provide specific dates, names, and events when available.
-            Keep your answer informative but concise. If context dose'nt match the question simply respond with I am a Nigerian law assistant. Please provide a meaningful question. For example: 'What are the legal requirements for registering a business in Nigeria?'.
+            template="""You are an expert on Nigerian laws. Use ONLY the following context to answer the question accurately and informatively.
 
-            Context:
-            {context}
+        IMPORTANT: If the provided context is NOT relevant to the question asked, respond with: "I don't have sufficient information about this specific topic in my current database. Please ask about topics covered in Nigerian legal documents I have access to."
 
-            Question: {question}
+        Context:
+        {context}
 
-            Answer:""",
+        Question: {question}
+
+        Answer:""",
             input_variables=["context", "question"]
         )
+
     def initialize_llm(self):
         return OllamaLLM(
             model=self.model_name, 
@@ -109,20 +119,52 @@ class NigerianLawRAG:
         print(f"Found {len(relevant_documents)} relevant documents.")
         return relevant_documents
     
+    def is_conversational(self, query: str) -> str | None:
+        
+        lower_query = query.lower().strip()
+        
+        greetings = ["hello", "hi", "hey", "greetings"]
+        what_are_you_phrases = ["what are you", "who are you", "tell me about yourself"]
+        
+        if any(g in lower_query for g in greetings):
+            return "greeting"
+        
+        if any(p in lower_query for p in what_are_you_phrases):
+            return "what_are_you"
+
+        return None
+    
+    def _is_context_relevant(self, question: str, documents: List[Document]) -> bool:
+
+        question_keywords = set(question.lower().split())
+        
+        for doc in documents:
+            doc_content = doc.page_content.lower()
+            doc_title = doc.metadata.get("file_path", "").lower()
+            
+            content_words = set(doc_content.split())
+            title_words = set(doc_title.split())
+            
+            overlap = question_keywords.intersection(content_words.union(title_words))
+            
+            if len(overlap) >= 5: 
+                return True
+        
+        return False
+    
     def generate_answer(self, question: str) -> Dict:
+        relevant_documents = self.search_relevant_chunks(question, top_k=5)
         
-        relevant_documents = self.search_relevant_chunks(question, top_k=3)
-        
-        if not relevant_documents:
-            print("No relevant documents found. Returning custom response.")
+        if not relevant_documents or not self._is_context_relevant(question, relevant_documents):
             return {
                 "question": question,
-                "answer": "I am a Nigerian law assistant. Please provide a meaningful question. For example: 'What are the legal requirements for registering a business in Nigeria?'",
+                "answer": "I don't have sufficient information about this specific topic in my current database.",
                 "sources": [],
-                "relevant_chunks_found": 0,
+                "relevant_chunks_found": len(relevant_documents) if relevant_documents else 0,
                 "context_chunks_used": 0,
                 "timestamp": datetime.now().isoformat()
             }
+    
         
         context_parts = []
         context_length = 0
@@ -166,6 +208,32 @@ class NigerianLawRAG:
         return response
     
     def ask_question(self, question: str) -> Dict:
+        
+        query_type = self._is_conversational(question)
+        
+        if query_type == "greeting":
+            prompt = self.welcome_prompt.format(user_greeting=question)
+            answer = self.llm.invoke(prompt)
+            return {
+                "question": question,
+                "answer": answer.strip(),
+                "sources": [],
+                "relevant_chunks_found": 0,
+                "context_chunks_used": 0,
+                "timestamp": datetime.now().isoformat()
+            }
+        
+        if query_type == "what_are_you":
+            prompt = self.what_are_you_prompt.format(user_question=question)
+            answer = self.llm.invoke(prompt)
+            return {
+                "question": question,
+                "answer": answer.strip(),
+                "sources": [],
+                "relevant_chunks_found": 0,
+                "context_chunks_used": 0,
+                "timestamp": datetime.now().isoformat()
+            }
         
         response = self.generate_answer(question)
         
