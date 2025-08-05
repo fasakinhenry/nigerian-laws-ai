@@ -8,7 +8,11 @@
   background-color: var(--background);
   position: relative;
 }
-
+.construct_banner {
+  position: absolute;
+  top: -15px;
+  right: 40px;
+}
 .chatBox {
   flex: 1;
   overflow-y: auto;
