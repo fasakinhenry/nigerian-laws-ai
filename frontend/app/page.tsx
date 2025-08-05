@@ -1,6 +1,8 @@
 'use client'
 import React, { useState, FormEvent, useRef, useEffect } from "react";
 import styles from './style/home.module.css';
+import Image from 'next/image';
+import LawImg from '@/app/assets/lawImg.png'
 
 interface Message {
   role: 'user' | 'assistant';
@@ -176,6 +178,12 @@ export default function Home() {
     return (
       <div className={styles.container}>
         <div className={styles.loadingContainer}>
+          <Image
+          src={LawImg}
+          alt="img"
+          height={100}
+          width={100}
+          />
           <p className={styles.loadingText}>Initializing Nigerian Laws AI Assistant...</p>
           <div className={styles.spinner}></div>
         </div>
