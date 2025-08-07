@@ -1,6 +1,7 @@
 import os
 from typing import List, Dict, Optional
 from datetime import datetime
+import logging
 
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_ollama import OllamaLLM
@@ -10,6 +11,12 @@ from langchain_core.documents import Document
 
 from dotenv import load_dotenv
 load_dotenv()
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 class NigerianLawRAG:
     
@@ -26,27 +33,6 @@ class NigerianLawRAG:
         self.llm = self.initialize_llm()
         
         self.vector_store = self.load_vector_store()
-        
-        self.welcome_prompt = PromptTemplate (
-            template="""You are a Nigerian Law AI Assistant. Respond to this greeting in a friendly, helpful, and concise manner.
-            Greet the user and ask them what legal topic they would like to know about today.
-            
-            User's greeting: {user_greeting}
-            
-            """,
-            input_variables=["user_greeting"]
-        )
-        
-        self.what_are_you_prompt = PromptTemplate (
-            template="""You are a Nigerian Law AI Assistant.
-            Answer the user's question about what you are.
-            Explain that you are an AI assistant designed to provide information on Nigerian laws,
-            based on a database of legal documents.
-
-            User's question: {user_question}
-            """,
-            input_variables=["user_question"]
-        )
         
         self.query_rewrite_prompt = PromptTemplate(
             template="""You are a legal search query optimizer. Reformulate the user's query to find relevant Nigerian legal documents.
@@ -105,7 +91,7 @@ class NigerianLawRAG:
     def _rewrite_query(self, query: str) -> str:
         rewrite_prompt_formatted = self.query_rewrite_prompt.format(original_query=query)
         rewritten_query = self.llm.invoke(rewrite_prompt_formatted)
-        print(f"Rewritten query: '{rewritten_query.strip()}'")
+        logger.debug(f"Rewritten query: '{rewritten_query.strip()}'") 
         return rewritten_query.strip()
         
     def search_relevant_chunks(self, query: str, top_k: int) -> List[Document]:
@@ -116,23 +102,8 @@ class NigerianLawRAG:
         
         relevant_documents = self.vector_store.similarity_search(rewritten_query, k=top_k)
         
-        print(f"Found {len(relevant_documents)} relevant documents.")
+        logger.info(f"Found {len(relevant_documents)} relevant documents.")
         return relevant_documents
-    
-    def is_conversational(self, query: str) -> str | None:
-        
-        lower_query = query.lower().strip()
-        
-        greetings = ["hello", "hi", "hey", "greetings"]
-        what_are_you_phrases = ["what are you", "who are you", "tell me about yourself"]
-        
-        if any(g in lower_query for g in greetings):
-            return "greeting"
-        
-        if any(p in lower_query for p in what_are_you_phrases):
-            return "what_are_you"
-
-        return None
     
     def _is_context_relevant(self, question: str, documents: List[Document]) -> bool:
 
@@ -153,7 +124,7 @@ class NigerianLawRAG:
         return False
     
     def generate_answer(self, question: str) -> Dict:
-        relevant_documents = self.search_relevant_chunks(question, top_k=5)
+        relevant_documents = self.search_relevant_chunks(question, top_k=7)
         
         if not relevant_documents or not self._is_context_relevant(question, relevant_documents):
             return {
@@ -189,7 +160,7 @@ class NigerianLawRAG:
             
         context = "".join(context_parts)
         
-        print(f"\nGenerated context for question '{question[:50]}...':\n{context}")
+        logger.debug(f"Generated context for question '{question[:50]}...':\n{context}")
         
         print(f"Generating answer using {self.model_type} ({self.model_name})...")
         prompt = self.prompt_template.format(context=context, question=question)
@@ -208,32 +179,6 @@ class NigerianLawRAG:
         return response
     
     def ask_question(self, question: str) -> Dict:
-        
-        query_type = self._is_conversational(question)
-        
-        if query_type == "greeting":
-            prompt = self.welcome_prompt.format(user_greeting=question)
-            answer = self.llm.invoke(prompt)
-            return {
-                "question": question,
-                "answer": answer.strip(),
-                "sources": [],
-                "relevant_chunks_found": 0,
-                "context_chunks_used": 0,
-                "timestamp": datetime.now().isoformat()
-            }
-        
-        if query_type == "what_are_you":
-            prompt = self.what_are_you_prompt.format(user_question=question)
-            answer = self.llm.invoke(prompt)
-            return {
-                "question": question,
-                "answer": answer.strip(),
-                "sources": [],
-                "relevant_chunks_found": 0,
-                "context_chunks_used": 0,
-                "timestamp": datetime.now().isoformat()
-            }
         
         response = self.generate_answer(question)
         
