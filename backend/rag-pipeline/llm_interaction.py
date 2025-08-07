@@ -49,18 +49,24 @@ class NigerianLawRAG:
             input_variables=["original_query"]
         )
         
+        self.unrelated_query_prompt = PromptTemplate(
+            template="""You are an expert on Nigerian law. The user has asked the question {question}
+            which is unrelated to your expertise, nudge them towards asking questions related to your expertise
+            in Nigeria law.
+            """,
+            input_variables=["question"]
+        )
+        
         self.prompt_template = PromptTemplate(
-            template="""You are an expert on Nigerian laws. Use ONLY the following context to answer the question accurately and informatively.
+            template="""you are an expert on Nigerian law answer this user's 
+                {question}
 
-        IMPORTANT: If the provided context is NOT relevant to the question asked, respond with: "I don't have sufficient information about this specific topic in my current database. Please ask about topics covered in Nigerian legal documents I have access to."
+                based on the following context {context}
 
-        Context:
-        {context}
+                - You must answer the question directly and nothing more.
 
-        Question: {question}
-
-        Answer:""",
-            input_variables=["context", "question"]
+                Answer:""",
+                input_variables=["context", "question"]
         )
 
     def initialize_llm(self):
@@ -127,11 +133,16 @@ class NigerianLawRAG:
         relevant_documents = self.search_relevant_chunks(question, top_k=7)
         
         if not relevant_documents or not self._is_context_relevant(question, relevant_documents):
+            
+            prompt_formatted = self.unrelated_query_prompt.format(question=question)
+            
+            generated_answer = self.llm.invoke(prompt_formatted)
+            
             return {
                 "question": question,
-                "answer": "I don't have sufficient information about this specific topic in my current database.",
+                "answer": generated_answer.strip(),
                 "sources": [],
-                "relevant_chunks_found": len(relevant_documents) if relevant_documents else 0,
+                "relevant_chunks_found": len(relevant_documents),
                 "context_chunks_used": 0,
                 "timestamp": datetime.now().isoformat()
             }
