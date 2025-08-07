@@ -14,16 +14,16 @@ interface Message {
 
 const suggestionCards = [
   {
-    title: "What are the legal requirements",
-    subtitle: "for company registration in Nigeria?"
+    title: "What is the legal process",
+    subtitle: "for registering a business in Nigeria?"
   },
   {
-    title: "How do I obtain",
-    subtitle: "a Certificate of Occupancy?"
+    title: "What is the punishment",
+    subtitle: "for theft under the Criminal Code?"
   },
   {
-    title: "What are the penalties",
-    subtitle: "for tax evasion under Nigerian law?"
+    title: "What are the requirements",
+    subtitle: "for forming a Limited Liability Company in Nigeria?"
   },
   {
     title: "Explain the process",
