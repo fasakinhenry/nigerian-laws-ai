@@ -2,6 +2,8 @@
 
 This project is an AI-powered assistant for Nigerian legal information, built on a Retrieval-Augmented Generation (RAG) pipeline.
 
+https://www.linkedin.com/posts/franklin-n_ai-nigeria-softwareengineering-ugcPost-7358526118993235969-Q1Sr
+
 ## Getting Started
 
 Follow these steps to set up and run the application locally using Docker Compose.
